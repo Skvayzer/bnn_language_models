@@ -1,3 +1,4 @@
+import os
 import unittest
 import yaml
 import pandas as pd
@@ -8,7 +9,7 @@ class TestDataset(unittest.TestCase):
 
     def test_dataset(self):
         config = yaml.load(
-            open("/Users/somov-od/Documents/projects/AIRI school/bnn_language_models/src/config.yaml", 'r'),
+            open(os.path.join(os.environ["PROJECT_PATH"], "src", "config.yaml"), 'r'),
             Loader=yaml.Loader)
         training_corpus_path = config['train_data_path']
         context_window = int(config['contex_window_size'])

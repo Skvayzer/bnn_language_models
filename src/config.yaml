@@ -2,8 +2,8 @@
 model_name: 'vanilla'
 learning_rate: 1e-3
 model_dimension: 300
-epoch_num: 30
+epoch_num: 5
 contex_window_size: 5
-train_data_path: '/Users/somov-od/Documents/projects/AIRI school/bnn_language_models/preprocessed-lenta/10000-entries/preprocessed-lenta.csv'
-val_corr_test_data_path: '/Users/somov-od/Documents/projects/AIRI school/bnn_language_models/preprocessed-lenta/10000-entries/preprocessed-ru_simlex965_tagged.tsv'
+train_data_path: 'preprocessed-lenta/10000-entries/preprocessed-lenta.csv'
+val_corr_test_data_path: 'preprocessed-lenta/10000-entries/preprocessed-ru_simlex965_tagged.tsv'
 val_analogy_test_data_path: ''

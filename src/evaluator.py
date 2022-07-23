@@ -30,7 +30,6 @@ def measure_words_correlation(corr_test_df, model_word_matrix, word2idx_dict):
             simularity_score_array.append(cosine_similarity)
 
         else:
-            print(word1, word2)
             oov_word_pair_count += 1
             simularity_score_array.append(0.0)
     pearson = stats.pearsonr(gold_similarity, simularity_score_array)
