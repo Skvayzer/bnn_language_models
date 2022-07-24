@@ -26,7 +26,10 @@ def measure_words_correlation(corr_test_df, model_word_matrix, word2idx_dict, de
             word1_emb = model_word_matrix(word1_tensor_idx).reshape(1,-1)
             word2_emb = model_word_matrix(word2_tensor_idx).reshape(1,-1)
 
-            cosine_similarity = CosineSimilarity(eps=1e6)(word1_emb, word2_emb).detach().numpy()[0]
+            if dev == 'cpu':
+                cosine_similarity = CosineSimilarity(eps=1e6)(word1_emb, word2_emb).detach().numpy()[0]
+            else:
+                cosine_similarity = CosineSimilarity(eps=1e6)(word1_emb, word2_emb).cpu().detach().numpy()[0]
             simularity_score_array.append(cosine_similarity)
 
         else:
