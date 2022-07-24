@@ -95,7 +95,8 @@ if __name__ == "__main__":
                 if idx % 100 == 0:
                     corr_score_dict = evaluator.measure_words_correlation(corr_test_df=validation_corr_df,
                                                                           model_word_matrix=w2v_model.central_embeddings,
-                                                                          word2idx_dict=w2v_dataset.word2idx)
+                                                                          word2idx_dict=w2v_dataset.word2idx,
+                                                                          dev=dev)
                     corr_score, p_val = corr_score_dict['pearson score'], corr_score_dict['p-val']
 
                     # TODO: Score word analogy dataset

@@ -4,7 +4,7 @@ from scipy import stats
 import torch
 
 
-def measure_words_correlation(corr_test_df, model_word_matrix, word2idx_dict):
+def measure_words_correlation(corr_test_df, model_word_matrix, word2idx_dict, dev):
     """
     for each pair in eval corr test dataset calculate cosine simularity
     then spearman test to given values
@@ -20,8 +20,8 @@ def measure_words_correlation(corr_test_df, model_word_matrix, word2idx_dict):
         word2_idx = word2idx_dict.get(word2)
 
         if word1_idx is not None and word2_idx is not None:
-            word1_tensor_idx = torch.tensor(word1_idx)
-            word2_tensor_idx = torch.tensor(word2_idx)
+            word1_tensor_idx = torch.tensor(word1_idx).to(dev)
+            word2_tensor_idx = torch.tensor(word2_idx).to(dev)
 
             word1_emb = model_word_matrix(word1_tensor_idx).reshape(1,-1)
             word2_emb = model_word_matrix(word2_tensor_idx).reshape(1,-1)
