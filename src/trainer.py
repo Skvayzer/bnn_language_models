@@ -40,7 +40,7 @@ if __name__ == "__main__":
     # TODO Read word analogy dataset
 
     # read train data
-    lenta_corpus_df = pd.read_csv(training_corpus_path).sample(n=100, random_state=42)
+    lenta_corpus_df = pd.read_csv(training_corpus_path)
     corpus = lenta_corpus_df['text'].tolist()
 
     # read val data
@@ -78,19 +78,21 @@ if __name__ == "__main__":
             for idx in tqdm(range(len(w2v_dataset))):
                 sample = w2v_dataset[idx]
 
-                pos_pair = torch.tensor(sample['original']).to(dev)
-                neg_pair = torch.tensor(sample['hard_negs']).to(dev)
+                #значит натокнулись на потовряющиеся токены в одном окне
+                if len(sample['original']) != 0:
+                    pos_pair = torch.tensor(sample['original']).to(dev)
+                    neg_pair = torch.tensor(sample['hard_negs']).to(dev)
 
-                pos_central, pos_context = pos_pair[:, 0], pos_pair[:, 1]
-                neg_central, neg_context = neg_pair[:, 0], neg_pair[:, 1]
+                    pos_central, pos_context = pos_pair[:, 0], pos_pair[:, 1]
+                    neg_central, neg_context = neg_pair[:, 0], neg_pair[:, 1]
 
-                loss = w2v_model.forward(pos_central, pos_context, neg_central, neg_context).mean()
+                    loss = w2v_model.forward(pos_central, pos_context, neg_central, neg_context).mean()
 
-                optimizer.zero_grad()
-                loss.backward()
-                optimizer.step()
+                    optimizer.zero_grad()
+                    loss.backward()
+                    optimizer.step()
 
-                epoch_loss += loss.item()
+                    epoch_loss += loss.item()
 
                 if idx % 100 == 0:
                     corr_score_dict = evaluator.measure_words_correlation(corr_test_df=validation_corr_df,
