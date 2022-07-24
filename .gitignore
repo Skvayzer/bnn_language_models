@@ -4,3 +4,4 @@ src/wandb
 *.model
 .idea
 src/__pycache__/
+embeddings_folder
