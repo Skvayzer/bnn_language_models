@@ -1,3 +1,4 @@
+import os
 import unittest
 
 import pandas as pd
@@ -12,9 +13,9 @@ class TestEvaluator(unittest.TestCase):
     @classmethod
     def test_measure_words_correlation(cls):
         config = yaml.load(
-            open("/Users/somov-od/Documents/projects/AIRI school/bnn_language_models/src/config.yaml", 'r'),
-        Loader=yaml.Loader)
-        validation_corr_test_df = config['val_corr_test_data_path']
+            open(os.path.join(os.environ["PROJECT_PATH"], "src", "config.yaml"), 'r'),
+            Loader=yaml.Loader)
+        validation_corr_test_df = os.path.join(os.environ["PROJECT_PATH"], config['val_corr_test_data_path'])
 
         validation_corr_df = pd.read_csv(validation_corr_test_df, sep='\t')
         total_words = set(validation_corr_df['# Word1'].to_list() + validation_corr_df['Word2'].to_list())

@@ -69,25 +69,23 @@ if __name__ == "__main__":
 
     try:
         for epoch_num in range(epoch_num):
-            steps_counter = 0
             epoch_loss = 0
             for idx in tqdm(range(len(w2v_dataset))):
                 sample = w2v_dataset[idx]
-                window_loss = 0
-                for pos_pair, neg_pair in (zip(sample['original'], sample['hard_negs'])):
-                    pos_central, pos_context = pos_pair
-                    neg_central, neg_context = neg_pair
 
-                    loss = w2v_model.forward(pos_central, pos_context, neg_central, neg_context)
+                pos_pair = torch.tensor(sample['original']).to(dev)
+                neg_pair = torch.tensor(sample['hard_negs']).to(dev)
 
-                    optimizer.zero_grad()
-                    loss.backward()
-                    optimizer.step()
+                pos_central, pos_context = pos_pair[:, 0], pos_pair[:, 1]
+                neg_central, neg_context = neg_pair[:, 0], neg_pair[:, 1]
 
-                    window_loss += loss.item()
-                    steps_counter += 1
+                loss = w2v_model.forward(pos_central, pos_context, neg_central, neg_context).mean()
 
-                    epoch_loss += window_loss
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
+
+                epoch_loss += loss.item()
 
                 if idx % 100 == 0:
                     corr_score_dict = evaluator.measure_words_correlation(corr_test_df=validation_corr_df,
@@ -97,10 +95,11 @@ if __name__ == "__main__":
 
                     # TODO: Score word analogy dataset
 
-                    wandb.log({"corr_score": corr_score, "p_val": p_val, "current_step_loss": window_loss})
+                    wandb.log({"corr_score": corr_score, "p_val": p_val})
 
-            epoch_avg_loss = epoch_loss / steps_counter
-            wandb.log({"epoch_sample_loss": epoch_avg_loss})
+            #epoch per sample loss
+            epoch_avg_per_sample_loss = epoch_loss / len(w2v_dataset)
+            wandb.log({"epoch_sample_loss": epoch_avg_per_sample_loss})
 
     except KeyboardInterrupt:
         hdd_dump_path = utils.dump_embeddings_to_hdd(w2v_model.central_embeddings)
@@ -115,5 +114,3 @@ if __name__ == "__main__":
     print(
         f'Dumped embeds to disk - total size for dim {model_dim} '
         f'with vocab size {len(w2v_dataset.word2idx)} == {hdd_size}')
-
-

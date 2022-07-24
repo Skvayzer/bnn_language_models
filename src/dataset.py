@@ -1,4 +1,6 @@
 import random
+
+import torch
 from torch.utils.data import Dataset
 
 
@@ -25,10 +27,16 @@ class Word2vecDataset(Dataset):
         for context_word in sentence_array[left_window_start:rigth_window_end]:
             context_word_idx = self.word2idx[context_word]
             if central_word_idx != context_word_idx:
-                result_dict['original'].append((central_word_idx, context_word_idx))
+                result_dict['original'].append([central_word_idx, context_word_idx])
 
         for _ in result_dict['original']:
-            central, context = random.sample(self.dataset, 2)
+
+            if idx != len(self.dataset):
+                remaining_samples = self.dataset[:idx] + self.dataset[idx+1:]
+            else:
+                remaining_samples = self.dataset[:idx]
+
+            central, context = random.sample(remaining_samples, 2)
 
             random_central_sentence = central.split()
             random_idx = random.choice(range(len(random_central_sentence)))
@@ -38,7 +46,7 @@ class Word2vecDataset(Dataset):
             random_idx = random.choice(range(len(random_context_sentence)))
             context_word_idx = self.word2idx[random_context_sentence[random_idx]]
 
-            result_dict['hard_negs'].append((central_word_idx, context_word_idx))
+            result_dict['hard_negs'].append([central_word_idx, context_word_idx])
 
         return result_dict
 

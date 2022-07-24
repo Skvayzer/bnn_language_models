@@ -17,16 +17,12 @@ class SkipGramModelHardNeg(nn.Module):
 
     # TODO: Implement batch processing
     def forward(self, central_word, context_word, neg_central_word, neg_context_word):
-        central_word_idx, context_word_idx = torch.tensor([central_word]).to(self.device), \
-                                             torch.tensor([context_word]).to(self.device)
-        neg_central_word_idx, neg_context_word_idx = torch.tensor([neg_central_word]).to(self.device), \
-                                                     torch.tensor([neg_context_word]).to(self.device)
 
-        emb_central = self.central_embeddings(central_word_idx)
-        emb_context = self.context_embeddings(context_word_idx)
+        emb_central = self.central_embeddings(central_word)
+        emb_context = self.context_embeddings(context_word)
 
-        neg_emb_central = self.central_embeddings(neg_central_word_idx)
-        neg_emb_context = self.context_embeddings(neg_context_word_idx)
+        neg_emb_central = self.central_embeddings(neg_central_word)
+        neg_emb_context = self.context_embeddings(neg_context_word)
 
         pos_score = torch.sum(torch.mul(emb_central, emb_context), dim=1)
         neg_score = torch.sum(torch.mul(neg_emb_central, neg_emb_context), dim=1)
