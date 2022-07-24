@@ -1,4 +1,5 @@
 import os
+import sys
 
 import torch.optim as optim
 import yaml
@@ -14,7 +15,11 @@ from skip_gram_hard_neg import SkipGramModelHardNeg
 
 if __name__ == "__main__":
 
-    wandb.login(key=os.environ['WANDB_KEY'])
+    if os.environ.get('PROJECT_PATH') is None:
+        #path to project
+        os.environ['PROJECT_PATH'] = os.getcwd().split('/')[0]
+        os.environ['WANDB_KEY'] = ''
+        os.environ['WANDB_CONFIG_DIR'] = '/tmp'
 
     if torch.cuda.is_available():
         dev = "cuda:0"
