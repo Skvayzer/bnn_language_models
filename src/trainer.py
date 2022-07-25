@@ -42,7 +42,7 @@ if __name__ == "__main__":
     val_analogy_data_path = os.path.join(os.environ['PROJECT_PATH'], config['val_analogy_test_data_path'])
 
     # read train data
-    lenta_corpus_df = pd.read_csv(training_corpus_path).sample(n=100)
+    lenta_corpus_df = pd.read_csv(training_corpus_path)
     corpus = lenta_corpus_df['text'].tolist()
 
     # read val data
