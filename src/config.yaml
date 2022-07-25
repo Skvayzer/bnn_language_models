@@ -4,7 +4,7 @@ learning_rate: 1e-3
 model_dimension: 300
 epoch_num: 5
 contex_window_size: 5
-train_data_path: 'preprocessed-lenta/10000-entries/test-preprocessed.csv'
-val_corr_test_data_path: 'preprocessed-lenta/10000-entries/test-preprocessed-ru_simlex965_tagged.tsv'
-val_analogy_test_data_path: 'preprocessed-lenta/10000-entries/preprocessed-ru-analogies.csv'
+train_data_path: 'preprocessed-lenta/20000-entries/test-preprocessed.csv'
+val_corr_test_data_path: 'preprocessed-lenta/20000-entries/test-preprocessed-ru_simlex965_tagged.tsv'
+val_analogy_test_data_path: 'preprocessed-lenta/20000-entries/preprocessed-ru-analogies.csv'
 embeddings_dump_path: 'embeddings_folder'
