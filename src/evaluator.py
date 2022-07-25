@@ -24,8 +24,8 @@ def measure_words_correlation(corr_test_df, model_word_matrix, word2idx_dict, de
             word1_tensor_idx = torch.tensor(word1_idx).to(dev)
             word2_tensor_idx = torch.tensor(word2_idx).to(dev)
 
-            word1_emb = model_word_matrix(word1_tensor_idx).reshape(1,-1)
-            word2_emb = model_word_matrix(word2_tensor_idx).reshape(1,-1)
+            word1_emb = model_word_matrix(word1_tensor_idx).reshape(1, -1)
+            word2_emb = model_word_matrix(word2_tensor_idx).reshape(1, -1)
 
             if dev == 'cpu':
                 cosine_similarity = CosineSimilarity(eps=1e6)(word1_emb, word2_emb).detach().numpy()[0]
@@ -36,12 +36,13 @@ def measure_words_correlation(corr_test_df, model_word_matrix, word2idx_dict, de
         else:
             oov_word_pair_count += 1
             simularity_score_array.append(0.0)
-    pearson = stats.pearsonr(gold_similarity, simularity_score_array)
+    spearman_score = stats.spearmanr(gold_similarity, simularity_score_array)
     return {
-        "pearson score": pearson[0],
-        "p-val": pearson[1],
+        "pearson score": spearman_score[0],
+        "p-val": spearman_score[1],
         "oov pairs": oov_word_pair_count
     }
+
 
 def measure_word_analogy_accuracy(analogy_test_df, model_word_matrix, word2idx_dict, dev):
     """
@@ -63,8 +64,6 @@ def measure_word_analogy_accuracy(analogy_test_df, model_word_matrix, word2idx_d
         word3_idx = word2idx_dict.get(word3)
         word4_idx = word2idx_dict.get(word4)
 
-
-
         if word1_idx is not None and word2_idx is not None and word3_idx is not None and word4_idx is not None:
 
             all_cnt += 1
@@ -72,29 +71,17 @@ def measure_word_analogy_accuracy(analogy_test_df, model_word_matrix, word2idx_d
             word1_tensor_idx = torch.tensor(word1_idx).to(dev)
             word2_tensor_idx = torch.tensor(word2_idx).to(dev)
             word3_tensor_idx = torch.tensor(word3_idx).to(dev)
-            word4_tensor_idx = torch.tensor(word4_idx).to(dev)
-
 
             word1_emb = model_word_matrix(word1_tensor_idx).reshape(1, -1)
             word2_emb = model_word_matrix(word2_tensor_idx).reshape(1, -1)
             word3_emb = model_word_matrix(word3_tensor_idx).reshape(1, -1)
-            word4_emb = model_word_matrix(word4_tensor_idx).reshape(1, -1)
 
             analogue_emb = word2_emb - word1_emb + word3_emb
 
-            best_id = None
-            best_sim = - np.inf
-
-            # print(model_word_matrix._parameters['weight'].shape)
             cosine_similarity = CosineSimilarity(eps=1e6, dim=1)(model_word_matrix._parameters['weight'],
-                                                          analogue_emb)
+                                                                 analogue_emb)
             idx_of_max = torch.argmax(cosine_similarity, dim=0).item()
-            if cosine_similarity[idx_of_max] > best_sim:
-                best_id = idx_of_max
-                best_sim = cosine_similarity[idx_of_max]
-
-
-            if best_id == word4_idx:
+            if idx_of_max == word4_idx:
                 good_cnt += 1
 
     return good_cnt / all_cnt

@@ -25,9 +25,7 @@ if __name__ == "__main__":
         dev = "cuda:0"
     else:
         dev = "cpu"
-    print(os.getcwd())
-    # TODO REMOVE THIS LINE, IT'S A KOSTIL'
-    os.environ['PROJECT_PATH'] = ".."
+
     config = yaml.load(open(os.path.join(os.environ['PROJECT_PATH'], 'src', 'config.yaml'), 'r'), Loader=yaml.Loader)
 
     model_name = config['model_name']
@@ -36,19 +34,19 @@ if __name__ == "__main__":
     model_dim = int(config['model_dimension'])
     context_window = int(config['contex_window_size'])
     epoch_num = int(config['epoch_num'])
+    embeddings_path = os.path.join(os.environ['PROJECT_PATH'], config['embeddings_dump_path'],
+                                          f"embs_matrix_{model_name}_{model_dim}.pkl")
 
     training_corpus_path = os.path.join(os.environ['PROJECT_PATH'], config['train_data_path'])
     val_corr_data_path = os.path.join(os.environ['PROJECT_PATH'], config['val_corr_test_data_path'])
-    # TODO Read word analogy dataset
     val_analogy_data_path = os.path.join(os.environ['PROJECT_PATH'], config['val_analogy_test_data_path'])
 
     # read train data
-    lenta_corpus_df = pd.read_csv(training_corpus_path)
+    lenta_corpus_df = pd.read_csv(training_corpus_path).sample(n=100)
     corpus = lenta_corpus_df['text'].tolist()
 
     # read val data
     validation_corr_df = pd.read_csv(val_corr_data_path, sep='\t')
-    # TODO Read analogy data
     validation_analogy_df = pd.read_csv(val_analogy_data_path, sep=' ')
     w2v_dataset = Word2vecDataset(corpus, context_window)
 
@@ -119,15 +117,13 @@ if __name__ == "__main__":
             wandb.log({"epoch_sample_loss": epoch_avg_per_sample_loss})
 
     except KeyboardInterrupt:
-        hdd_dump_path = utils.dump_embeddings_to_hdd(w2v_model.central_embeddings)
-        hdd_size = utils.eval_data_size(hdd_dump_path)
+
+        hdd_size = utils.get_embeddings_hdd_size(w2v_model.central_embeddings, embeddings_path)
         wandb.log({"embeddings_size": hdd_size})
         print(f'Dumped embeds to disk - total size for dim {model_dim} '
               f'with vocab size {len(w2v_dataset.word2idx)} == {hdd_size}')
 
-    hdd_dump_path = utils.dump_embeddings_to_hdd(w2v_model.central_embeddings)
-    hdd_size = utils.eval_data_size(hdd_dump_path)
+    hdd_size = utils.get_embeddings_hdd_size(w2v_model.central_embeddings, embeddings_path)
     wandb.log({"embeddings_size": hdd_size})
-    print(
-        f'Dumped embeds to disk - total size for dim {model_dim} '
-        f'with vocab size {len(w2v_dataset.word2idx)} == {hdd_size}')
+    print(f'Dumped embeds to disk - total size for dim {model_dim} '
+          f'with vocab size {len(w2v_dataset.word2idx)} == {hdd_size}')
