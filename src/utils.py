@@ -2,14 +2,14 @@ import pickle
 import os
 
 def dump_embeddings_to_hdd(model_embeddings):
-    # TODO: Implelent pickle dump to HDD -> return path to dump
-    f = open('model_embeddings', 'w')
+    f = open('model_embeddings', 'wb')
     pickle.dump(model_embeddings, f)
+    path = os.path.realpath(f.name)
     f.close()
-    return os.path.realpath(f.name)
+    return path
 
 def eval_data_size(path):
-    # TODO: Eval HDD embeddings size
-    f = open(path, 'r')
+    f = open(path, 'rb')
+    size = os.fstat(f.fileno()).st_size
     f.close()
-    return os.fstat(f.fileno()).st_size
+    return size
