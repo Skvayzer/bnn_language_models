@@ -15,7 +15,6 @@ class SkipGramModelHardNeg(nn.Module):
         init.uniform_(self.central_embeddings.weight.data, -initrange, initrange)
         init.uniform_(self.context_embeddings.weight.data, -initrange, initrange)
 
-    # TODO: Implement batch processing
     def forward(self, central_word, context_word, neg_central_word, neg_context_word):
 
         emb_central = self.central_embeddings(central_word)

@@ -25,7 +25,8 @@ class TestEvaluator(unittest.TestCase):
 
         evaluation_data = evaluator.measure_words_correlation(corr_test_df=validation_corr_df,
                                                               model_word_matrix=model.central_embeddings,
-                                                              word2idx_dict=test_word2idx_dict)
+                                                              word2idx_dict=test_word2idx_dict,
+                                                              dev='cpu')
         print(evaluation_data)
 
         assert list(evaluation_data.keys()) == ["pearson score", "p-val", "oov pairs"]
