@@ -25,7 +25,9 @@ if __name__ == "__main__":
         dev = "cuda:0"
     else:
         dev = "cpu"
-
+    print(os.getcwd())
+    # TODO REMOVE THIS LINE, IT'S A KOSTIL'
+    os.environ['PROJECT_PATH'] = ".."
     config = yaml.load(open(os.path.join(os.environ['PROJECT_PATH'], 'src', 'config.yaml'), 'r'), Loader=yaml.Loader)
 
     model_name = config['model_name']
@@ -38,6 +40,7 @@ if __name__ == "__main__":
     training_corpus_path = os.path.join(os.environ['PROJECT_PATH'], config['train_data_path'])
     val_corr_data_path = os.path.join(os.environ['PROJECT_PATH'], config['val_corr_test_data_path'])
     # TODO Read word analogy dataset
+    val_analogy_data_path = os.path.join(os.environ['PROJECT_PATH'], config['val_analogy_test_data_path'])
 
     # read train data
     lenta_corpus_df = pd.read_csv(training_corpus_path)
@@ -46,7 +49,7 @@ if __name__ == "__main__":
     # read val data
     validation_corr_df = pd.read_csv(val_corr_data_path, sep='\t')
     # TODO Read analogy data
-
+    validation_analogy_df = pd.read_csv(val_analogy_data_path, sep=' ')
     w2v_dataset = Word2vecDataset(corpus, context_window)
 
     w2v_model = None
@@ -102,8 +105,14 @@ if __name__ == "__main__":
                     corr_score, p_val = corr_score_dict['pearson score'], corr_score_dict['p-val']
 
                     # TODO: Score word analogy dataset
+                    analogy_score = evaluator.measure_word_analogy_accuracy(analogy_test_df=validation_analogy_df,
+                                                                          model_word_matrix=w2v_model.central_embeddings,
+                                                                          word2idx_dict=w2v_dataset.word2idx,
+                                                                          dev=dev)
 
                     wandb.log({"corr_score": corr_score, "p_val": p_val})
+                    wandb.log({"analogy_accuracy": analogy_score})
+
 
             #epoch per sample loss
             epoch_avg_per_sample_loss = epoch_loss / len(w2v_dataset)
